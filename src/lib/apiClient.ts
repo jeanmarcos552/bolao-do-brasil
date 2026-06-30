@@ -6,7 +6,7 @@ export async function apiFetch<T>(
   if (opts.token) headers['Authorization'] = `Bearer ${opts.token}`;
   if (opts.body !== undefined) headers['content-type'] = 'application/json';
   const res = await fetch(path, {
-    method: opts.method ?? 'GET',
+    method: opts.method ?? (opts.body !== undefined ? 'POST' : 'GET'),
     headers,
     body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
   });

@@ -28,4 +28,12 @@ describe('apiFetch', () => {
     vi.stubGlobal('fetch', fetchMock);
     await expect(apiFetch('/api/x', { token: 't' })).rejects.toThrow('Palpites encerrados');
   });
+
+  it('usa POST por padrão quando há body sem method explícito', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+    await apiFetch('/api/x', { body: { a: 1 }, token: 't' });
+    const [, init] = fetchMock.mock.calls[0];
+    expect(init.method).toBe('POST');
+  });
 });
