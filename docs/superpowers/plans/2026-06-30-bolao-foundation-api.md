@@ -480,24 +480,48 @@ git commit -m "feat: função pura de premiação por rodada (vencedores + ratei
 
 ```ts
 import { cert, getApps, initializeApp, type App } from 'firebase-admin/app';
-import { getFirestore, Timestamp } from 'firebase-admin/firestore';
-import { getAuth } from 'firebase-admin/auth';
+import { getFirestore, Timestamp, type Firestore } from 'firebase-admin/firestore';
+import { getAuth, type Auth } from 'firebase-admin/auth';
 
+// Init LAZY (via Proxy): apenas importar este módulo não tem efeito colateral,
+// então build e testes não precisam de credenciais reais. A inicialização
+// acontece no primeiro uso (tempo de request).
+let cachedApp: App | undefined;
 function getAdminApp(): App {
+  if (cachedApp) return cachedApp;
   const existing = getApps();
-  if (existing.length) return existing[0];
-  return initializeApp({
-    credential: cert({
-      projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-      // a private key vem com \n escapados nas env vars
-      privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    }),
-  });
+  cachedApp = existing.length
+    ? existing[0]
+    : initializeApp({
+        credential: cert({
+          projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
+          clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
+          // a private key vem com \n escapados nas env vars
+          privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        }),
+      });
+  return cachedApp;
 }
 
-export const adminDb = getFirestore(getAdminApp());
-export const adminAuth = getAuth(getAdminApp());
+let cachedDb: Firestore | undefined;
+let cachedAuth: Auth | undefined;
+function db(): Firestore { return (cachedDb ??= getFirestore(getAdminApp())); }
+function authImpl(): Auth { return (cachedAuth ??= getAuth(getAdminApp())); }
+
+export const adminDb: Firestore = new Proxy({} as Firestore, {
+  get(_t, prop) {
+    const real = db() as unknown as Record<string | symbol, unknown>;
+    const v = real[prop];
+    return typeof v === 'function' ? (v as (...a: unknown[]) => unknown).bind(real) : v;
+  },
+});
+export const adminAuth: Auth = new Proxy({} as Auth, {
+  get(_t, prop) {
+    const real = authImpl() as unknown as Record<string | symbol, unknown>;
+    const v = real[prop];
+    return typeof v === 'function' ? (v as (...a: unknown[]) => unknown).bind(real) : v;
+  },
+});
 export { Timestamp };
 ```
 
