@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthProvider';
 import { useRequireProfile } from '@/hooks/useRequireProfile';
 import Header from '@/components/Header';
 import Loading from '@/components/Loading';
+import Flag from '@/components/Flag';
 import { formatKickoff } from '@/lib/format';
 import type { MatchDTO, BetDTO } from '@/lib/types';
 
@@ -18,7 +19,7 @@ export default function AdminPage() {
   const [err, setErr] = useState<string | null>(null);
 
   // form de cadastro
-  const [form, setForm] = useState({ homeTeam: 'Brasil', awayTeam: '', homeFlag: '🇧🇷', awayFlag: '', competition: 'Eliminatórias', kickoff: '', cota: '10' });
+  const [form, setForm] = useState({ homeTeam: 'Brasil', awayTeam: '', homeFlag: '', awayFlag: '', competition: 'Eliminatórias', kickoff: '', cota: '10' });
 
   const load = useCallback(async () => {
     try { const d = await call<{ matches: MatchWithBet[] }>('/api/matches'); setMatches(d.matches); }
@@ -61,8 +62,8 @@ export default function AdminPage() {
           <div className="grid grid-cols-2 gap-2 text-sm">
             <label className="flex flex-col">Mandante<input value={form.homeTeam} onChange={(e) => setForm({ ...form, homeTeam: e.target.value })} className="border rounded p-1.5" /></label>
             <label className="flex flex-col">Visitante<input value={form.awayTeam} onChange={(e) => setForm({ ...form, awayTeam: e.target.value })} className="border rounded p-1.5" /></label>
-            <label className="flex flex-col">Bandeira mandante<input value={form.homeFlag} onChange={(e) => setForm({ ...form, homeFlag: e.target.value })} className="border rounded p-1.5" /></label>
-            <label className="flex flex-col">Bandeira visitante<input value={form.awayFlag} onChange={(e) => setForm({ ...form, awayFlag: e.target.value })} className="border rounded p-1.5" /></label>
+            <label className="flex flex-col col-span-2">URL bandeira mandante (.svg)<input value={form.homeFlag} onChange={(e) => setForm({ ...form, homeFlag: e.target.value })} placeholder="https://s.sde.globo.com/.../Brasil.svg" className="border rounded p-1.5" /></label>
+            <label className="flex flex-col col-span-2">URL bandeira visitante (.svg)<input value={form.awayFlag} onChange={(e) => setForm({ ...form, awayFlag: e.target.value })} placeholder="https://s.sde.globo.com/.../Noruega.svg" className="border rounded p-1.5" /></label>
             <label className="flex flex-col">Competição<input value={form.competition} onChange={(e) => setForm({ ...form, competition: e.target.value })} className="border rounded p-1.5" /></label>
             <label className="flex flex-col">Cota (R$)<input type="number" value={form.cota} onChange={(e) => setForm({ ...form, cota: e.target.value })} className="border rounded p-1.5" /></label>
             <label className="flex flex-col col-span-2">Data e hora do jogo<input type="datetime-local" value={form.kickoff} onChange={(e) => setForm({ ...form, kickoff: e.target.value })} className="border rounded p-1.5" /></label>
@@ -92,7 +93,7 @@ function ResultRow({ match, onDone }: { match: MatchDTO; onDone: () => void }) {
   }
   return (
     <div className="bg-white border border-gray-200 rounded p-3 mb-2 flex items-center gap-2 text-sm">
-      <span className="flex-1">{match.homeFlag} {match.homeTeam} x {match.awayTeam} {match.awayFlag} <span className="text-gray-400">· {formatKickoff(match.kickoffAt)}</span></span>
+      <span className="flex-1 flex items-center gap-1 flex-wrap"><Flag src={match.homeFlag} alt={match.homeTeam} className="w-5 h-4" /> {match.homeTeam} x {match.awayTeam} <Flag src={match.awayFlag} alt={match.awayTeam} className="w-5 h-4" /> <span className="text-gray-400">· {formatKickoff(match.kickoffAt)}</span></span>
       <input type="number" inputMode="numeric" min={0} aria-label={`placar mandante ${match.id}`} value={h} onChange={(e) => setH(e.target.value)} className="w-12 border rounded text-center" />
       <span>x</span>
       <input type="number" inputMode="numeric" min={0} aria-label={`placar visitante ${match.id}`} value={a} onChange={(e) => setA(e.target.value)} className="w-12 border rounded text-center" />

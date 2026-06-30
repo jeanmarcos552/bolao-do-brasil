@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthProvider';
 import { useRequireProfile } from '@/hooks/useRequireProfile';
 import Header from '@/components/Header';
 import Loading from '@/components/Loading';
+import Flag from '@/components/Flag';
 import { formatBRL, formatKickoff } from '@/lib/format';
 import type { MatchDTO, BetDTO } from '@/lib/types';
 
@@ -34,9 +35,9 @@ export default function JogoPage() {
     <Main>
       <div className="text-[11px] uppercase tracking-wide text-gray-400 mb-1">{match.competition} · {formatKickoff(match.kickoffAt)}</div>
       <div className="flex items-center justify-center gap-3 my-3">
-        <span className="font-bold w-28 text-right">{match.homeFlag} {match.homeTeam}</span>
+        <span className="font-bold w-28 inline-flex items-center justify-end gap-1.5"><Flag src={match.homeFlag} alt={match.homeTeam} className="w-6 h-5" /> {match.homeTeam}</span>
         <span className="text-2xl font-extrabold">{match.status === 'finished' ? `${match.homeScore} x ${match.awayScore}` : 'x'}</span>
-        <span className="font-bold w-28">{match.awayTeam} {match.awayFlag}</span>
+        <span className="font-bold w-28 inline-flex items-center gap-1.5">{match.awayTeam} <Flag src={match.awayFlag} alt={match.awayTeam} className="w-6 h-5" /></span>
       </div>
 
       {round && round.winners.length > 0 && (

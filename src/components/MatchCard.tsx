@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthProvider';
 import { formatBRL, formatKickoff, isLocked } from '@/lib/format';
+import Flag from '@/components/Flag';
 import type { MatchDTO, BetDTO } from '@/lib/types';
 
 type MatchWithBet = MatchDTO & { myBet: Pick<BetDTO, 'homeGuess' | 'awayGuess' | 'points'> | null };
@@ -10,7 +11,7 @@ type MatchWithBet = MatchDTO & { myBet: Pick<BetDTO, 'homeGuess' | 'awayGuess' |
 function Team({ flag, name }: { flag: string; name: string }) {
   return (
     <div className="flex flex-col items-center gap-1.5 w-28">
-      <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center text-2xl">{flag}</div>
+      <Flag src={flag} alt={name} className="w-10 h-10 rounded" />
       <b className="text-sm text-center">{name}</b>
     </div>
   );
