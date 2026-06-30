@@ -21,6 +21,9 @@ export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }
     }
     if (b.cota !== undefined) update.cota = Number(b.cota);
     if (b.kickoffAt !== undefined) update.kickoffAt = Timestamp.fromMillis(Number(b.kickoffAt));
+    if (Object.keys(update).length === 0) {
+      return NextResponse.json({ error: 'Nada para atualizar' }, { status: 400 });
+    }
     await adminDb.collection('matches').doc(id).update(update);
     return NextResponse.json({ ok: true });
   } catch (e) {
