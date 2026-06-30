@@ -67,7 +67,7 @@ export default function AdminPage() {
             <label className="flex flex-col">Cota (R$)<input type="number" value={form.cota} onChange={(e) => setForm({ ...form, cota: e.target.value })} className="border rounded p-1.5" /></label>
             <label className="flex flex-col col-span-2">Data e hora do jogo<input type="datetime-local" value={form.kickoff} onChange={(e) => setForm({ ...form, kickoff: e.target.value })} className="border rounded p-1.5" /></label>
           </div>
-          <button onClick={criar} disabled={!form.awayTeam || !form.kickoff}
+          <button onClick={criar} disabled={!form.homeTeam || !form.awayTeam || !form.kickoff}
             className="mt-3 bg-verde text-white font-bold py-2 px-4 rounded uppercase text-xs disabled:opacity-50">Cadastrar jogo</button>
         </section>
 
@@ -93,10 +93,10 @@ function ResultRow({ match, onDone }: { match: MatchDTO; onDone: () => void }) {
   return (
     <div className="bg-white border border-gray-200 rounded p-3 mb-2 flex items-center gap-2 text-sm">
       <span className="flex-1">{match.homeFlag} {match.homeTeam} x {match.awayTeam} {match.awayFlag} <span className="text-gray-400">· {formatKickoff(match.kickoffAt)}</span></span>
-      <input aria-label={`placar mandante ${match.id}`} value={h} onChange={(e) => setH(e.target.value)} className="w-10 border rounded text-center" />
+      <input type="number" inputMode="numeric" min={0} aria-label={`placar mandante ${match.id}`} value={h} onChange={(e) => setH(e.target.value)} className="w-12 border rounded text-center" />
       <span>x</span>
-      <input aria-label={`placar visitante ${match.id}`} value={a} onChange={(e) => setA(e.target.value)} className="w-10 border rounded text-center" />
-      <button onClick={lancar} disabled={h === '' || a === ''} className="bg-verde text-white font-bold px-3 py-1.5 rounded text-xs disabled:opacity-50">Lançar</button>
+      <input type="number" inputMode="numeric" min={0} aria-label={`placar visitante ${match.id}`} value={a} onChange={(e) => setA(e.target.value)} className="w-12 border rounded text-center" />
+      <button onClick={lancar} disabled={h === '' || a === '' || Number.isNaN(Number(h)) || Number.isNaN(Number(a))} className="bg-verde text-white font-bold px-3 py-1.5 rounded text-xs disabled:opacity-50">Lançar</button>
       {err && <span className="text-red-600 text-xs">{err}</span>}
     </div>
   );
