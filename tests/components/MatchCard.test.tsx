@@ -25,4 +25,9 @@ describe('MatchCard', () => {
     expect(screen.getByText(/\+1 ponto/i)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /salvar palpite/i })).toBeNull();
   });
+
+  it('jogo encerrado com pontuação ainda não calculada não mostra "+null"', () => {
+    render(<MatchCard match={{ ...base, status: 'finished', kickoffAt: 1, homeScore: 2, awayScore: 0, myBet: { homeGuess: 1, awayGuess: 1, points: null } }} onSaved={() => {}} />);
+    expect(screen.queryByText(/null/)).toBeNull();
+  });
 });

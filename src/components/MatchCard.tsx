@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/context/AuthProvider';
 import { formatBRL, formatKickoff, isLocked } from '@/lib/format';
 import type { MatchDTO, BetDTO } from '@/lib/types';
@@ -77,9 +78,9 @@ export default function MatchCard({ match, onSaved }: { match: MatchWithBet; onS
       {match.status === 'finished' && (
         <div className="text-center mt-2.5 text-xs text-gray-600">
           {match.myBet ? <>Seu palpite: <b>{match.myBet.homeGuess} x {match.myBet.awayGuess}</b> &nbsp;
-            <span className="bg-verde-claro text-verde rounded px-2 py-0.5 font-bold">+{match.myBet.points} ponto{match.myBet.points === 1 ? '' : 's'}</span></>
+            {match.myBet.points != null && <span className="bg-verde-claro text-verde rounded px-2 py-0.5 font-bold">+{match.myBet.points} ponto{match.myBet.points === 1 ? '' : 's'}</span>}</>
             : 'Você não palpitou neste jogo'}
-          <div className="mt-2"><a href={`/jogo/${match.id}`} className="text-verde underline text-xs">Ver palpites e vencedor →</a></div>
+          <div className="mt-2"><Link href={`/jogo/${match.id}`} className="text-verde underline text-xs">Ver palpites e vencedor →</Link></div>
         </div>
       )}
       {err && <p className="text-red-600 text-xs mt-2 text-center">{err}</p>}
