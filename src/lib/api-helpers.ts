@@ -17,6 +17,10 @@ export function toMillis(v: unknown): number {
   return 0;
 }
 
+export function isValidScore(n: unknown): n is number {
+  return typeof n === 'number' && Number.isInteger(n) && n >= 0 && n <= 99;
+}
+
 export function toMatchDTO(id: string, d: Record<string, unknown>): MatchDTO {
   return {
     id,

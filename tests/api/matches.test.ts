@@ -20,6 +20,15 @@ beforeEach(() => {
 });
 
 describe('GET /api/matches', () => {
+  it('não lista jogos deletados', async () => {
+    h.store.matches.set('mdel', { homeTeam: 'X', awayTeam: 'Y', kickoffAt: 3000, cota: 10, status: 'deleted', homeScore: null, awayScore: null });
+    const headers = asUser(h, 'u1', 'jean@x.com', 'Jean');
+    const { GET } = await import('@/app/api/matches/route');
+    const res = await GET(new Request('http://t/api/matches', { headers }));
+    const body = await res.json();
+    expect(body.matches.find((m: any) => m.id === 'mdel')).toBeUndefined();
+  });
+
   it('lista jogos ordenados por kickoff e inclui meu palpite', async () => {
     const headers = asUser(h, 'u1', 'jean@x.com', 'Jean');
     const { GET } = await import('@/app/api/matches/route');

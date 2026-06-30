@@ -1,14 +1,11 @@
 import { NextResponse } from 'next/server';
 import { adminDb, Timestamp } from '@/lib/firebaseAdmin';
 import { requireAdmin, HttpError } from '@/lib/auth';
-import { jsonError } from '@/lib/api-helpers';
+import { jsonError, isValidScore } from '@/lib/api-helpers';
 import { scoreBet } from '@/lib/scoring';
 
 export const runtime = 'nodejs';
 
-function isValidScore(n: unknown): n is number {
-  return typeof n === 'number' && Number.isInteger(n) && n >= 0 && n <= 99;
-}
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {

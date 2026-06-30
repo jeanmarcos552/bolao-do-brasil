@@ -26,9 +26,11 @@ export async function GET(req: Request) {
         return { uid: b.uid, userName: b.userName, pixKey: '', points: b.points ?? 0 };
       });
       const result = resolveRound(scored, Number(m.cota ?? 0));
-      for (const w of result.winners) {
-        const row = rows.get(w.uid);
-        if (row) row.roundsWon += 1;
+      if (result.topPoints > 0) {
+        for (const w of result.winners) {
+          const row = rows.get(w.uid);
+          if (row) row.roundsWon += 1;
+        }
       }
     }
 

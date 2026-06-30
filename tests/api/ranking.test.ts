@@ -21,6 +21,22 @@ beforeEach(() => {
 });
 
 describe('GET /api/ranking', () => {
+  it('rodada 0 a 0 (todos zerados) não conta vitória', async () => {
+    h.store.matches.clear(); h.store.bets.clear();
+    h.store.matches.set('mz', { status: 'finished', cota: 10, kickoffAt: 1 });
+    h.store.bets.set('mz', new Map([
+      ['u1', { uid: 'u1', userName: 'Jean', points: 0 }],
+      ['u2', { uid: 'u2', userName: 'Bia', points: 0 }],
+    ]));
+    const headers = asUser(h, 'u1', 'jean@x.com', 'Jean');
+    const { GET } = await import('@/app/api/ranking/route');
+    const res = await GET(new Request('http://t/api/ranking', { headers }));
+    const body = await res.json();
+    const byUid = Object.fromEntries(body.ranking.map((r: any) => [r.uid, r]));
+    expect(byUid['u1'].roundsWon).toBe(0);
+    expect(byUid['u2'].roundsWon).toBe(0);
+  });
+
   it('soma pontos e conta rodadas vencidas, ignorando jogos não finalizados', async () => {
     const headers = asUser(h, 'u1', 'jean@x.com', 'Jean');
     const { GET } = await import('@/app/api/ranking/route');

@@ -1,4 +1,4 @@
-export type MatchStatus = 'scheduled' | 'finished';
+export type MatchStatus = 'scheduled' | 'finished' | 'deleted';
 
 export interface UserProfile {
   uid: string;

@@ -14,6 +14,14 @@ beforeEach(() => {
 });
 
 describe('GET /api/matches/[id]', () => {
+  it('404 para jogo deletado', async () => {
+    h.store.matches.set('mdel', { homeTeam: 'X', awayTeam: 'Y', kickoffAt: 1, cota: 10, status: 'deleted', homeScore: null, awayScore: null });
+    const headers = asUser(h, 'u1', 'jean@x.com', 'Jean');
+    const { GET } = await import('@/app/api/matches/[id]/route');
+    const res = await GET(new Request('http://t/api/matches/mdel', { headers }), ctx('mdel'));
+    expect(res.status).toBe(404);
+  });
+
   it('antes da trava, só mostra o próprio palpite', async () => {
     h.store.matches.set('m1', { homeTeam: 'Brasil', awayTeam: 'Peru', kickoffAt: NOW + 1000, cota: 10, status: 'scheduled', homeScore: null, awayScore: null });
     h.store.bets.set('m1', new Map([

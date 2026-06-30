@@ -15,6 +15,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     const matchSnap = await adminDb.collection('matches').doc(id).get();
     if (!matchSnap.exists) return NextResponse.json({ error: 'Jogo não encontrado' }, { status: 404 });
     const matchData = matchSnap.data() as Record<string, unknown>;
+    if (matchData.status === 'deleted') return NextResponse.json({ error: 'Jogo não encontrado' }, { status: 404 });
     const dto = toMatchDTO(id, matchData);
 
     const betsSnap = await adminDb.collection('matches').doc(id).collection('bets').get();

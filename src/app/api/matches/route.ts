@@ -19,7 +19,7 @@ export async function GET(req: Request) {
       }),
     );
     matches.sort((a, b) => a.kickoffAt - b.kickoffAt);
-    return NextResponse.json({ matches });
+    return NextResponse.json({ matches: matches.filter((m) => m.status !== 'deleted') });
   } catch (e) {
     return jsonError(e);
   }
