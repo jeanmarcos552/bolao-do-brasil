@@ -133,10 +133,10 @@ scoreBet(homeGuess, awayGuess, homeFinal, awayFinal):
 - **Vencedor(es):** quem tiver a **maior pontuação** no jogo (entre quem palpitou).
 - **Pote:** cada participante que palpitou "deve" 1 cota.
   - **1 vencedor:** cada um dos demais (`N − 1`) manda 1 cota via Pix pro vencedor.
-  - **Empate de `K` vencedores:** o pote dos não-vencedores (`cota × (N − K)`) é
-    dividido igualmente entre os `K` vencedores. O app mostra a chave Pix de cada
-    vencedor e o valor total do pote; o "quem paga pra quem" no empate fica a
-    combinar no grupo (dinheiro é manual).
+  - **Empate de `K` vencedores:** o **valor arrecadado** (`cota × (N − K)` — as
+    cotas dos não-vencedores) é **dividido igualmente entre os `K` vencedores**,
+    ou seja, `cota × (N − K) / K` para cada um. O app exibe a chave Pix de **todos**
+    os vencedores e quanto cada um recebe.
 - Se ninguém pontuou acima de 0, ainda há vencedor (o de maior pontuação; pode
   haver empate em 0 → todos empatados, sem rateio prático). O app exibe o caso.
 
@@ -146,7 +146,8 @@ Visual estilo Globo Esporte com paleta da bandeira:
 `--verde-escuro #00501f` (título), `--verde #009c3b` (abas/botões/detalhes),
 `--amarelo #ffdf00` (destaques), fundo claro `#f0f0f0`, cards brancos.
 
-1. **Login** — botão "Entrar com Google".
+1. **Login** — botão "Entrar com Google", com fundo bem-humorado: animação do
+   Paquetá "levando bolada" (piada interna da família). Arquivo `bg_login.webp` na raiz.
 2. **Primeiro acesso** — confirma nome (vem do Google) e cadastra a **chave Pix**.
 3. **Home / Jogos** — abas (Jogos · Ranking · Minha conta). Seção "Próximos jogos"
    com cards de palpite (2 campos de placar + "Salvar palpite" + aviso de trava) e
@@ -241,5 +242,8 @@ PORT=3000
 
 ## 13. Questões em aberto
 
-- Confirmar a regra de **empate na premiação** (rateio do pote no item 6).
-- Bandeiras na v1 são **emoji** de país; escudos/imagens ficam para uma versão futura.
+Nenhuma — todos os pontos foram confirmados pelo usuário:
+- Empate na premiação: valor arrecadado dividido igualmente entre os vencedores, exibindo o Pix de todos (item 6).
+- Bandeiras na v1 são **emoji**; escudos/imagens ficam para versão futura.
+- Palpites alheios só ficam visíveis após a trava do jogo.
+- Fundo do login: animação do Paquetá "levando bolada" (`bg_login.webp`).
