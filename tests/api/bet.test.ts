@@ -64,4 +64,36 @@ describe('POST /api/matches/[id]/bet', () => {
     const res = await POST(post(headers, { homeGuess: 1, awayGuess: 1 }), ctx('xx'));
     expect(res.status).toBe(404);
   });
+
+  it('400 placar não inteiro', async () => {
+    openMatch();
+    const headers = asUser(h, 'u1', 'jean@x.com', 'Jean');
+    const { POST } = await import('@/app/api/matches/[id]/bet/route');
+    const res = await POST(post(headers, { homeGuess: 1.5, awayGuess: 1 }), ctx('m1'));
+    expect(res.status).toBe(400);
+  });
+
+  it('400 placar acima do limite', async () => {
+    openMatch();
+    const headers = asUser(h, 'u1', 'jean@x.com', 'Jean');
+    const { POST } = await import('@/app/api/matches/[id]/bet/route');
+    const res = await POST(post(headers, { homeGuess: 100, awayGuess: 1 }), ctx('m1'));
+    expect(res.status).toBe(400);
+  });
+
+  it('400 placar não numérico', async () => {
+    openMatch();
+    const headers = asUser(h, 'u1', 'jean@x.com', 'Jean');
+    const { POST } = await import('@/app/api/matches/[id]/bet/route');
+    const res = await POST(post(headers, { homeGuess: '2', awayGuess: 1 }), ctx('m1'));
+    expect(res.status).toBe(400);
+  });
+
+  it('409 exatamente no horário do jogo (boundary >=)', async () => {
+    h.store.matches.set('m1', { homeTeam: 'Brasil', awayTeam: 'Peru', kickoffAt: NOW, cota: 10, status: 'scheduled' });
+    const headers = asUser(h, 'u1', 'jean@x.com', 'Jean');
+    const { POST } = await import('@/app/api/matches/[id]/bet/route');
+    const res = await POST(post(headers, { homeGuess: 2, awayGuess: 1 }), ctx('m1'));
+    expect(res.status).toBe(409);
+  });
 });

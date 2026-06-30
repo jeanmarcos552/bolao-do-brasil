@@ -15,13 +15,13 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const { id } = await ctx.params;
     const u = await requireUser(req);
 
-    const userSnap = await adminDb.collection('users').doc(u.uid).get();
-    const profile = userSnap.exists ? (userSnap.data() as UserProfile) : null;
-    if (!profile?.pixKey) throw new HttpError(403, 'Cadastre sua chave Pix antes de palpitar');
-
     const matchSnap = await adminDb.collection('matches').doc(id).get();
     if (!matchSnap.exists) throw new HttpError(404, 'Jogo não encontrado');
     const match = matchSnap.data() as Record<string, unknown>;
+
+    const userSnap = await adminDb.collection('users').doc(u.uid).get();
+    const profile = userSnap.exists ? (userSnap.data() as UserProfile) : null;
+    if (!profile?.pixKey) throw new HttpError(403, 'Cadastre sua chave Pix antes de palpitar');
 
     if (Date.now() >= toMillis(match.kickoffAt)) throw new HttpError(409, 'Palpites encerrados para este jogo');
 
