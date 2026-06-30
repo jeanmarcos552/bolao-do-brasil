@@ -1,11 +1,7 @@
 {
   "name": "bolao-brasil",
   "version": "0.1.0",
-  "description": "",
-  "main": "index.js",
-  "directories": {
-    "doc": "docs"
-  },
+  "private": true,
   "scripts": {
     "test": "vitest run",
     "dev": "next dev",
@@ -14,10 +10,6 @@
     "lint": "next lint",
     "test:watch": "vitest"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-"private": true,
   "dependencies": {
     "firebase": "^12.15.0",
     "firebase-admin": "^14.1.0",
