@@ -45,4 +45,14 @@ describe('PUT /api/me', () => {
     expect(body.pixKey).toBe('jean@pix');
     expect(h.store.users.get('u1')!.pixKey).toBe('jean@pix');
   });
+
+  it('400 quando falta nome ou pix', async () => {
+    const headers = asUser(h, 'u1', 'jean@x.com', 'Jean');
+    const { PUT } = await loadRoute();
+    const res = await PUT(new Request('http://t/api/me', {
+      method: 'PUT', headers: { ...headers, 'content-type': 'application/json' },
+      body: JSON.stringify({ name: '', pixKey: '' }),
+    }));
+    expect(res.status).toBe(400);
+  });
 });

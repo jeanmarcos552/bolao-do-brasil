@@ -31,6 +31,9 @@ function makeFirestore(store: Store) {
             const prev = opts?.merge ? sub2.get(betId) ?? {} : {};
             sub2.set(betId, { ...prev, ...data });
           },
+          async update(data: Doc) {
+            sub2.set(betId, { ...(sub2.get(betId) ?? {}), ...data });
+          },
         }),
         async get() {
           return { docs: [...sub2.entries()].map(([bid, d]) => ({ id: bid, data: () => d })) };
