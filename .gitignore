@@ -20,7 +20,8 @@ next-env.d.ts
 
 # firebase service account
 *serviceAccount*.json
-firebase-adminsdk*.json
+*firebase-adminsdk*.json
+*-adminsdk-*.json
 
 # logs
 npm-debug.log*
