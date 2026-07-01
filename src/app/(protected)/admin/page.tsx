@@ -1,5 +1,6 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthProvider';
 import Loading from '@/components/Loading';
@@ -85,16 +86,21 @@ function ResultRow({ match, onDone }: { match: MatchDTO; onDone: () => void }) {
     } catch (e) { setErr(e instanceof Error ? e.message : 'Erro ao lançar'); }
   }
   return (
-    <div className="bg-white border border-gray-200 rounded p-3 mb-2 flex items-center gap-2 text-sm">
-      <span className="flex-1 flex items-center gap-1 flex-wrap">
-        <Flag src={match.homeFlag} alt={match.homeTeam} className="w-5 h-4" /> {match.homeTeam} x {match.awayTeam} <Flag src={match.awayFlag} alt={match.awayTeam} className="w-5 h-4" />
-        <span className="text-gray-400">· {formatKickoff(match.kickoffAt)}</span>
-      </span>
-      <input type="number" inputMode="numeric" min={0} aria-label={`placar mandante ${match.id}`} value={h} onChange={(e) => setH(e.target.value)} className="w-12 border rounded text-center" />
-      <span>x</span>
-      <input type="number" inputMode="numeric" min={0} aria-label={`placar visitante ${match.id}`} value={a} onChange={(e) => setA(e.target.value)} className="w-12 border rounded text-center" />
-      <button onClick={lancar} disabled={h === '' || a === '' || Number.isNaN(Number(h)) || Number.isNaN(Number(a))} className="bg-verde text-white font-bold px-3 py-1.5 rounded text-xs disabled:opacity-50">Lançar</button>
-      {err && <span className="text-red-600 text-xs">{err}</span>}
+    <div className="bg-white border border-gray-200 rounded p-3 mb-2 text-sm">
+      <div className="flex items-center gap-2">
+        <span className="flex-1 flex items-center gap-1 flex-wrap">
+          <Flag src={match.homeFlag} alt={match.homeTeam} className="w-5 h-4" /> {match.homeTeam} x {match.awayTeam} <Flag src={match.awayFlag} alt={match.awayTeam} className="w-5 h-4" />
+          <span className="text-gray-400">· {formatKickoff(match.kickoffAt)}</span>
+        </span>
+        <input type="number" inputMode="numeric" min={0} aria-label={`placar mandante ${match.id}`} value={h} onChange={(e) => setH(e.target.value)} className="w-12 border rounded text-center" />
+        <span>x</span>
+        <input type="number" inputMode="numeric" min={0} aria-label={`placar visitante ${match.id}`} value={a} onChange={(e) => setA(e.target.value)} className="w-12 border rounded text-center" />
+        <button onClick={lancar} disabled={h === '' || a === '' || Number.isNaN(Number(h)) || Number.isNaN(Number(a))} className="bg-verde text-white font-bold px-3 py-1.5 rounded text-xs disabled:opacity-50">Lançar</button>
+      </div>
+      <div className="mt-2 flex items-center justify-between gap-2">
+        <Link href={`/jogo/${match.id}`} className="text-verde underline text-xs">Conduzir ao vivo →</Link>
+        {err && <span className="text-red-600 text-xs">{err}</span>}
+      </div>
     </div>
   );
 }

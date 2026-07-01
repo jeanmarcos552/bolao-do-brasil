@@ -22,4 +22,18 @@ describe('AdminPage', () => {
     render(<AdminPage />);
     await waitFor(() => expect(replace).toHaveBeenCalledWith('/'));
   });
+
+  it('jogo agendado tem link "Conduzir ao vivo" para a página do jogo', async () => {
+    profileRef.profile = { isAdmin: true };
+    call.mockResolvedValue({
+      matches: [{
+        id: 'm1', homeTeam: 'Brasil', awayTeam: 'Peru', homeFlag: '', awayFlag: '', competition: 'Eliminatórias',
+        kickoffAt: 1, cota: 10, status: 'scheduled', homeScore: null, awayScore: null,
+        extraTime: false, penalties: false, homePen: 0, awayPen: 0, myBet: null,
+      }],
+    });
+    render(<AdminPage />);
+    const link = await screen.findByRole('link', { name: /conduzir ao vivo/i });
+    expect(link).toHaveAttribute('href', '/jogo/m1');
+  });
 });
