@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 import { adminDb, Timestamp } from '@/lib/firebaseAdmin';
 import { requireAdmin, HttpError } from '@/lib/auth';
 import { jsonError, isValidScore } from '@/lib/api-helpers';
-import { scoreBet } from '@/lib/scoring';
+import { scoreBetForMatch } from '@/lib/scoring';
+import { notifyMatchUpdate } from '@/lib/wsNotify';
 
 export const runtime = 'nodejs';
-
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
@@ -16,6 +16,10 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     if (!isValidScore(b.homeScore) || !isValidScore(b.awayScore)) {
       return NextResponse.json({ error: 'Placar inválido' }, { status: 400 });
     }
+    const penalties = b.penalties === true;
+    if (penalties && (!isValidScore(b.homePen) || !isValidScore(b.awayPen) || b.homePen === b.awayPen)) {
+      return NextResponse.json({ error: 'Pênaltis inválidos' }, { status: 400 });
+    }
 
     const matchRef = adminDb.collection('matches').doc(id);
     const snap = await matchRef.get();
@@ -24,10 +28,18 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       throw new HttpError(409, 'Jogo já finalizado');
     }
 
+    const matchState = {
+      homeScore: b.homeScore,
+      awayScore: b.awayScore,
+      penalties,
+      homePen: penalties ? b.homePen : 0,
+      awayPen: penalties ? b.awayPen : 0,
+    };
+
     const betsSnap = await matchRef.collection('bets').get();
     for (const betDoc of betsSnap.docs) {
       const bet = betDoc.data() as { homeGuess: number; awayGuess: number };
-      const points = scoreBet(bet.homeGuess, bet.awayGuess, b.homeScore, b.awayScore);
+      const points = scoreBetForMatch(bet, matchState);
       await matchRef.collection('bets').doc(betDoc.id).set({ points }, { merge: true });
     }
 
@@ -35,9 +47,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       status: 'finished',
       homeScore: b.homeScore,
       awayScore: b.awayScore,
+      extraTime: b.extraTime === true,
+      penalties,
+      homePen: matchState.homePen,
+      awayPen: matchState.awayPen,
       finishedAt: Timestamp.now(),
     });
 
+    await notifyMatchUpdate(id).catch(() => {});
     return NextResponse.json({ ok: true, scored: betsSnap.docs.length });
   } catch (e) {
     return jsonError(e);

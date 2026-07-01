@@ -40,4 +40,33 @@ describe('POST /api/admin/matches/[id]/result', () => {
     const res = await POST(send(headers, { homeScore: 1, awayScore: 1 }), ctx('m1'));
     expect(res.status).toBe(409);
   });
+
+  it('encerra nos pênaltis pontuando por vencedor (1/0)', async () => {
+    // regulamento 1x1, pênaltis 5x4 (mandante vence)
+    h.store.matches.set('m1', { homeTeam: 'Brasil', awayTeam: 'Peru', kickoffAt: 1, cota: 10, status: 'live', homeScore: 1, awayScore: 1 });
+    h.store.bets.set('m1', new Map([
+      ['u1', { uid: 'u1', userName: 'Jean', homeGuess: 2, awayGuess: 0, points: null }], // apostou mandante -> 1
+      ['u2', { uid: 'u2', userName: 'Bia', homeGuess: 0, awayGuess: 1, points: null }],  // apostou visitante -> 0
+      ['u3', { uid: 'u3', userName: 'Léo', homeGuess: 1, awayGuess: 1, points: null }],  // empate -> 0
+    ]));
+    const headers = asUser(h, 'a1', 'admin@x.com', 'Admin');
+    const { POST } = await import('@/app/api/admin/matches/[id]/result/route');
+    const res = await POST(send(headers, { homeScore: 1, awayScore: 1, penalties: true, homePen: 5, awayPen: 4 }), ctx('m1'));
+    expect(res.status).toBe(200);
+    const bets = h.store.bets.get('m1')!;
+    expect(bets.get('u1')!.points).toBe(1);
+    expect(bets.get('u2')!.points).toBe(0);
+    expect(bets.get('u3')!.points).toBe(0);
+    const m = h.store.matches.get('m1')!;
+    expect(m.status).toBe('finished');
+    expect(m.penalties).toBe(true);
+    expect(m.homePen).toBe(5);
+  });
+
+  it('400 se pênaltis marcado mas empatado', async () => {
+    const headers = asUser(h, 'a1', 'admin@x.com', 'Admin');
+    const { POST } = await import('@/app/api/admin/matches/[id]/result/route');
+    const res = await POST(send(headers, { homeScore: 1, awayScore: 1, penalties: true, homePen: 3, awayPen: 3 }), ctx('m1'));
+    expect(res.status).toBe(400);
+  });
 });
