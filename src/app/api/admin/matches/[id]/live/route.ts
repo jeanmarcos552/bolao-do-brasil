@@ -39,7 +39,9 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     }
 
     await matchRef.update(update);
-    await notifyMatchUpdate(id);
+    // Aviso best-effort: o placar já foi gravado, então nunca deixe o nudge
+    // do WS derrubar a resposta (notifyMatchUpdate já é no-throw por contrato).
+    await notifyMatchUpdate(id).catch(() => {});
     return NextResponse.json({ ok: true });
   } catch (e) {
     return jsonError(e);
