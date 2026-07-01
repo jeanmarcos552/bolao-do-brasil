@@ -31,13 +31,20 @@ describe('LiveLeaderboard', () => {
     expect(screen.getByText('🥉')).toBeInTheDocument();
   });
 
-  it('eliminado: 120px, borda vermelha e sem medalha', () => {
+  it('eliminado: 120px, borda vermelha, grayscale e sem medalha', () => {
     render(<LiveLeaderboard rows={rows} />);
     const el = screen.getByTestId('leader-u5') as HTMLElement;
     expect(el.style.width).toBe('120px');
     expect(el.innerHTML).toContain('border-red-500');
-    const img = el.querySelector('img');
-    // Zé não tem foto -> fallback com iniciais; garante que o wrapper marca grayscale via classe/filtro
     expect(el.querySelector('.border-2')).not.toBeNull();
+    // Avatar recebe grayscale => filtro grayscale(1) chega ao DOM (guarda contra remover o prop).
+    expect(el.innerHTML).toContain('grayscale');
+  });
+
+  it('eliminado no topo (posição 1) força 120px e sem medalha', () => {
+    render(<LiveLeaderboard rows={[row({ uid: 'x1', userName: 'Zé', position: 1, eliminated: true })]} />);
+    const el = screen.getByTestId('leader-x1') as HTMLElement;
+    expect(el.style.width).toBe('120px');
+    expect(screen.queryByText('🥇')).toBeNull();
   });
 });
