@@ -34,5 +34,9 @@ export function toMatchDTO(id: string, d: Record<string, unknown>): MatchDTO {
     status: (d.status as MatchDTO['status']) ?? 'scheduled',
     homeScore: d.homeScore === null || d.homeScore === undefined ? null : Number(d.homeScore),
     awayScore: d.awayScore === null || d.awayScore === undefined ? null : Number(d.awayScore),
+    extraTime: d.extraTime === true,
+    penalties: d.penalties === true,
+    homePen: Number(d.homePen ?? 0),
+    awayPen: Number(d.awayPen ?? 0),
   };
 }

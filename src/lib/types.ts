@@ -1,4 +1,4 @@
-export type MatchStatus = 'scheduled' | 'finished' | 'deleted';
+export type MatchStatus = 'scheduled' | 'live' | 'finished' | 'deleted';
 
 export interface UserProfile {
   uid: string;
@@ -22,6 +22,10 @@ export interface MatchDTO {
   status: MatchStatus;
   homeScore: number | null;
   awayScore: number | null;
+  extraTime: boolean;
+  penalties: boolean;
+  homePen: number;
+  awayPen: number;
 }
 
 export interface BetDTO {
