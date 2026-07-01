@@ -26,14 +26,15 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     const revealed = dto.status !== 'scheduled' || Date.now() >= toMillis(matchData.kickoffAt);
     const bets = revealed ? allBets : allBets.filter((b) => b.uid === u.uid);
 
-    // Cache de photoURL por uid (uma leitura por palpiteiro), reutilizado por leaderboard e vencedores.
-    const photoByUid = new Map<string, string>();
-    async function photoFor(uid: string): Promise<string> {
-      if (photoByUid.has(uid)) return photoByUid.get(uid)!;
+    // Cache de usuário por uid (uma leitura por palpiteiro), reutilizado por leaderboard e vencedores (foto + pix).
+    const userByUid = new Map<string, { photoURL: string; pixKey: string }>();
+    async function userFor(uid: string): Promise<{ photoURL: string; pixKey: string }> {
+      if (userByUid.has(uid)) return userByUid.get(uid)!;
       const s = await adminDb.collection('users').doc(uid).get();
-      const p = s.exists ? (s.data() as UserProfile).photoURL ?? '' : '';
-      photoByUid.set(uid, p);
-      return p;
+      const data = s.exists ? (s.data() as UserProfile) : undefined;
+      const entry = { photoURL: data?.photoURL ?? '', pixKey: data?.pixKey ?? '' };
+      userByUid.set(uid, entry);
+      return entry;
     }
 
     let leaderboard = null;
@@ -43,7 +44,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
         liveBets.push({
           uid: b.uid,
           userName: b.userName,
-          photoURL: await photoFor(b.uid),
+          photoURL: (await userFor(b.uid)).photoURL,
           homeGuess: b.homeGuess,
           awayGuess: b.awayGuess,
         });
@@ -62,12 +63,11 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     if (dto.status === 'finished') {
       const scored: ScoredBet[] = [];
       for (const b of allBets) {
-        const userSnap = await adminDb.collection('users').doc(b.uid).get();
-        const pixKey = userSnap.exists ? (userSnap.data() as UserProfile).pixKey : '';
+        const pixKey = (await userFor(b.uid)).pixKey;
         scored.push({ uid: b.uid, userName: b.userName, pixKey, points: b.points ?? 0 });
       }
       const r = resolveRound(scored, dto.cota);
-      const winners = await Promise.all(r.winners.map(async (w) => ({ ...w, photoURL: await photoFor(w.uid) })));
+      const winners = await Promise.all(r.winners.map(async (w) => ({ ...w, photoURL: (await userFor(w.uid)).photoURL })));
       round = { ...r, winners };
     }
 
