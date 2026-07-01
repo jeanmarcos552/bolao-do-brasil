@@ -27,7 +27,7 @@ describe('notifyMatchUpdate', () => {
     expect((init as RequestInit).method).toBe('POST');
     const headers = (init as RequestInit).headers as Record<string, string>;
     expect(headers['X-API-KEY']).toBe('secret');
-    expect(JSON.parse((init as RequestInit).body as string)).toMatchObject({ event: 'match_update', room: 'match:m1', matchId: 'm1' });
+    expect(JSON.parse((init as RequestInit).body as string)).toEqual({ event: 'match_update', payload: { event_id: 'match:m1' } });
   });
 
   it('não lança se o fetch rejeitar', async () => {
