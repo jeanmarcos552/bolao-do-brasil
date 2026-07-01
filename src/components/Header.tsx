@@ -2,10 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthProvider';
-
-function initials(name: string): string {
-  return name.split(' ').filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase()).join('') || '?';
-}
+import { initials } from '@/lib/initials';
 
 export default function Header() {
   const { profile, signOut } = useAuth();
