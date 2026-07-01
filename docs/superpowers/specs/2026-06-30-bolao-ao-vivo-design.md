@@ -30,6 +30,10 @@ botão de copiar o Pix.
    apostou empate ou no outro time = 0.
 3. **Controles do admin inline** na página do jogo (`/jogo/[id]`), visíveis só
    para admin.
+4. **Eliminados** no leaderboard: quem não pode mais alcançar o placar exato **e**
+   está com o resultado contra o palpite aparece por último, com borda vermelha de
+   2px e foto em preto e branco. Recalculado a cada atualização (se o jogo virar,
+   sai da zona de eliminado).
 
 ## 1. Modelo de dados (documento `matches`)
 
@@ -91,21 +95,51 @@ export function scoreBetForMatch(
 
 Usada **tanto** no leaderboard ao vivo quanto no encerramento (finalize).
 
+### `isEliminated(bet, match): boolean` (nova)
+
+Um palpite está eliminado quando **não pode mais alcançar o placar exato** e o
+**resultado atual está contra** o que ele apostou. Como gols só aumentam, o placar
+exato só é alcançável se `homeGuess >= homeScore && awayGuess >= awayScore` (ou,
+com o jogo encerrado, exatamente igual).
+
+```ts
+interface MatchElimState { homeScore: number; awayScore: number; penalties: boolean; homePen: number; awayPen: number; status: string }
+export function isEliminated(
+  bet: { homeGuess: number; awayGuess: number }, m: MatchElimState,
+): boolean {
+  if (m.penalties) {
+    const w = outcome(m.homePen, m.awayPen);          // quem venceu/está vencendo nos pênaltis
+    return w !== 0 && outcome(bet.homeGuess, bet.awayGuess) !== w;
+  }
+  const final = m.status === 'finished';
+  const exactReachable = final
+    ? bet.homeGuess === m.homeScore && bet.awayGuess === m.awayScore
+    : bet.homeGuess >= m.homeScore && bet.awayGuess >= m.awayScore;
+  if (exactReachable) return false;                    // ainda pode cravar o exato
+  return outcome(bet.homeGuess, bet.awayGuess) !== outcome(m.homeScore, m.awayScore);
+}
+```
+
+Exemplos: `1x0` com jogo `0x1` → eliminado (exato impossível + resultado contra).
+`2x1` com jogo `0x1` → **não** eliminado (exato 2x1 ainda alcançável). No
+encerramento, eliminado equivale a "fez 0 pontos".
+
 ### `buildLeaderboard(bets, match): LeaderRow[]` (nova, src/lib/leaderboard.ts)
 
 ```ts
 export interface LiveBet { uid: string; userName: string; photoURL: string; homeGuess: number; awayGuess: number }
-export interface LeaderRow { uid: string; userName: string; photoURL: string; points: number; position: number }
+export interface LeaderRow { uid: string; userName: string; photoURL: string; points: number; position: number; eliminated: boolean }
 ```
 
-Regras de ordenação:
-1. pontos desc (via `scoreBetForMatch`);
-2. desempate por proximidade do placar exato: `|homeGuess - homeScore| + |awayGuess - awayScore|` asc (no modo pênaltis, usa o placar do tempo normal armazenado em `homeScore/awayScore`);
-3. desempate final por `userName` asc.
+Ordenação:
+1. **não-eliminados antes de eliminados** (`isEliminated` manda os eliminados para o fim);
+2. pontos desc (via `scoreBetForMatch`);
+3. desempate por proximidade do placar exato: `|homeGuess - homeScore| + |awayGuess - awayScore|` asc (no modo pênaltis, usa o placar do tempo normal em `homeScore/awayScore`);
+4. desempate final por `userName` asc.
 
-Atribui `position` sequencial (1,2,3,…) — usada para o tamanho do avatar. Os
-empates reais de **prêmio** são resolvidos no encerramento por `resolveRound`
-(que divide a cota entre os empatados no topo).
+Atribui `position` sequencial (1,2,3,…) na ordem final — usada para o tamanho do
+avatar. Os empates reais de **prêmio** são resolvidos no encerramento por
+`resolveRound` (que divide a cota entre os empatados no topo).
 
 ## 3. API
 
@@ -196,6 +230,8 @@ sala `match:{id}`. Snippet será fornecido ao usuário para colar no
 - Círculo com a foto (`photoURL`) do Google; `size` em px configurável.
 - Fallback: iniciais do nome sobre fundo verde (reaproveita lógica de `initials`).
 - `<img>` simples (evita configurar domínio `lh3.googleusercontent.com` no next/image).
+- Prop `grayscale?: boolean` — quando `true`, aplica `filter: grayscale(1)` (usada
+  para eliminados).
 
 ### `LiveScoreboard` (dentro da page ou componente)
 
@@ -208,7 +244,12 @@ sala `match:{id}`. Snippet será fornecido ao usuário para colar no
 - Por item: medalha acima (🥇 no 1º, 🥈 no 2º, 🥉 no 3º; demais sem medalha),
   avatar dimensionado por `position` — **1º 240px, 2º 200px, 3º 180px, demais
   120px** — e abaixo a colocação ("1º", "2º"…) e o nome.
-- Recebe `LeaderRow[]`; re-renderiza a cada refetch.
+- **Eliminados** (`row.eliminated === true`): sempre renderizados a 120px, **sem
+  medalha** (mesmo que caíssem no top-3 por posição), com **borda vermelha de 2px**
+  (`border-2 border-red-500`) e **foto em preto e branco** (`grayscale`). O `Avatar`
+  recebe uma prop `grayscale?: boolean`; a borda é aplicada pelo wrapper do item.
+- Recebe `LeaderRow[]`; re-renderiza a cada refetch (um palpite pode sair da zona
+  de eliminado se o jogo virar).
 
 ## 6. Tela do vencedor (status `finished`)
 
@@ -239,14 +280,26 @@ sala `match:{id}`. Snippet será fornecido ao usuário para colar no
 ## 8. Testes
 
 - **Puros:** `scoreBetPenalties`, `scoreBetForMatch`, `buildLeaderboard`
-  (ordenação e posições, incluindo empates e modo pênaltis).
+  (ordenação e posições, incluindo empates e modo pênaltis), `isEliminated`.
+- **`isEliminated` (casos):**
+  - `1x0` com jogo `0x1` → **eliminado** (exemplo do usuário: exato impossível +
+    resultado contra).
+  - `2x1` com jogo `0x1` → **não** eliminado (exato 2x1 ainda alcançável).
+  - `1x0` com jogo `1x0` (ao vivo) → não eliminado (ainda pode cravar).
+  - `2x0` com jogo `1x0` → não eliminado (exato 2x0 ainda alcançável).
+  - `0x0` com jogo `1x0` → eliminado (exato impossível + resultado contra).
+  - Pênaltis: apostou no time que **perdeu** os pênaltis → eliminado; apostou no
+    vencedor → não; pênaltis empatados (`homePen === awayPen`) → ninguém eliminado.
+  - `finished`: exato só conta com `===` (ex.: `2x0` com final `1x0` → eliminado).
+  - `buildLeaderboard` manda eliminados para o fim mesmo com pontuação igual.
 - **API (fake do Firestore):** `POST .../live` (validação, transição de status,
   409 em finished), `POST .../result` com pênaltis (pontua por vencedor; 400 se
   pênaltis empatado), `GET /api/matches/[id]` devolve `leaderboard` e `photoURL`.
 - **`wsNotify`:** no-op sem env; não lança quando `fetch` rejeita (mock).
-- **Componentes (RTL/jsdom):** `Avatar` (foto e fallback de iniciais),
-  `LiveLeaderboard` (tamanho por posição, medalhas top-3), `Confetti` (renderiza),
-  botão copiar-Pix (chama `navigator.clipboard`), tela do vencedor.
+- **Componentes (RTL/jsdom):** `Avatar` (foto, fallback de iniciais, `grayscale`),
+  `LiveLeaderboard` (tamanho por posição, medalhas top-3, eliminado com borda
+  vermelha + grayscale + sem medalha), `Confetti` (renderiza), botão copiar-Pix
+  (chama `navigator.clipboard`), tela do vencedor.
 
 ## Dependências e configuração
 
