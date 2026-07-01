@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 
 vi.mock('next/navigation', () => ({ useParams: () => ({ id: 'm1' }), usePathname: () => '/jogo/m1', useRouter: () => ({ replace: vi.fn(), push: vi.fn() }) }));
 vi.mock('socket.io-client', () => ({ io: () => ({ on: vi.fn(), emit: vi.fn(), disconnect: vi.fn() }) }));
@@ -24,7 +24,9 @@ describe('JogoPage', () => {
     call.mockResolvedValue(finishedData);
     render(<JogoPage />);
     await waitFor(() => expect(screen.getByText(/jean@pix/i)).toBeInTheDocument());
-    expect(screen.getAllByText('Bia')[0]).toBeInTheDocument();
+    // "Bia" aparece no leaderboard E na tabela de palpites; escopa na tabela p/ testar
+    // especificamente a seção de palpites (o leaderboard renderiza divs/avatares, não <table>).
+    expect(within(screen.getByRole('table')).getByText('Bia')).toBeInTheDocument();
   });
 
   it('admin em jogo ao vivo vê os controles', async () => {
