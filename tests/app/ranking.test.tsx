@@ -10,7 +10,7 @@ const call = vi.fn().mockResolvedValue({ ranking: [
 vi.mock('@/context/AuthProvider', () => ({ useAuth: () => ({ call }) }));
 vi.mock('@/hooks/useRequireProfile', () => ({ useRequireProfile: () => ({ ready: true, profile: { isAdmin: false } }) }));
 
-import RankingPage from '@/app/ranking/page';
+import RankingPage from '@/app/(protected)/ranking/page';
 
 describe('RankingPage', () => {
   it('lista os participantes com pontos', async () => {

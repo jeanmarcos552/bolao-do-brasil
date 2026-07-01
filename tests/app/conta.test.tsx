@@ -9,7 +9,7 @@ const refreshProfile = vi.fn();
 const authValue = { user: { uid: 'u1' }, profile: { name: 'Jean', email: 'j@x.com', pixKey: '', isAdmin: false }, loading: false, call, refreshProfile };
 vi.mock('@/context/AuthProvider', () => ({ useAuth: () => authValue }));
 
-import ContaPage from '@/app/conta/page';
+import ContaPage from '@/app/(protected)/conta/page';
 
 describe('ContaPage', () => {
   it('salva nome e pix via PUT /api/me', async () => {

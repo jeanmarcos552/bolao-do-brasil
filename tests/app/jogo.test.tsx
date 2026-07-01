@@ -11,7 +11,7 @@ const call = vi.fn().mockResolvedValue({
 vi.mock('@/context/AuthProvider', () => ({ useAuth: () => ({ call }) }));
 vi.mock('@/hooks/useRequireProfile', () => ({ useRequireProfile: () => ({ ready: true, profile: { isAdmin: false } }) }));
 
-import JogoPage from '@/app/jogo/[id]/page';
+import JogoPage from '@/app/(protected)/jogo/[id]/page';
 
 describe('JogoPage', () => {
   it('mostra o vencedor e a chave Pix', async () => {
