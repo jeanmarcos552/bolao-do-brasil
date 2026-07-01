@@ -16,8 +16,12 @@ async function loadOrCreate(uid: string, email: string, name: string, photoURL: 
     return profile;
   }
   const data = snap.data() as UserProfile;
+  const patch: Partial<UserProfile> = {};
   // mantém isAdmin sincronizado com a env var
-  if (data.isAdmin !== admin) { await ref.update({ isAdmin: admin }); data.isAdmin = admin; }
+  if (data.isAdmin !== admin) patch.isAdmin = admin;
+  // captura/atualiza a foto do Google (não apaga a existente se o token vier sem picture)
+  if (photoURL && data.photoURL !== photoURL) patch.photoURL = photoURL;
+  if (Object.keys(patch).length) { await ref.update(patch); Object.assign(data, patch); }
   return { ...data, uid };
 }
 

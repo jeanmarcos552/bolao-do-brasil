@@ -78,7 +78,7 @@ export function installAdminMock(): MockHandles {
 }
 
 /** Header Authorization e resposta padrão do verifyIdToken. */
-export function asUser(h: MockHandles, uid: string, email: string, name = uid) {
-  h.verifyIdToken.mockResolvedValue({ uid, email, name, picture: '' });
+export function asUser(h: MockHandles, uid: string, email: string, name = uid, picture = '') {
+  h.verifyIdToken.mockResolvedValue({ uid, email, name, picture });
   return { Authorization: `Bearer fake-${uid}` };
 }

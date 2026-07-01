@@ -21,4 +21,18 @@ describe('Header', () => {
     render(<Header />);
     expect(screen.getByText('Admin')).toBeInTheDocument();
   });
+
+  it('mostra a foto do Google quando o perfil tem photoURL', () => {
+    authValue.profile = { name: 'Jean Silva', isAdmin: false, photoURL: 'http://foto/jean.png' };
+    render(<Header />);
+    const img = screen.getByAltText('Jean Silva') as HTMLImageElement;
+    expect(img.src).toContain('http://foto/jean.png');
+  });
+
+  it('cai para as iniciais quando não há photoURL', () => {
+    authValue.profile = { name: 'Jean Silva', isAdmin: false, photoURL: '' };
+    render(<Header />);
+    expect(screen.queryByRole('img')).toBeNull();
+    expect(screen.getByText('JS')).toBeInTheDocument();
+  });
 });

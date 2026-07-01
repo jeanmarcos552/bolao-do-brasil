@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthProvider';
-import { initials } from '@/lib/initials';
+import Avatar from '@/components/Avatar';
 
 export default function Header() {
   const { profile, signOut } = useAuth();
@@ -22,9 +22,7 @@ export default function Header() {
           BOLÃO DA SELEÇÃO
         </div>
         <div className="flex items-center gap-3">
-          <span className="bg-amarelo text-verde-escuro rounded-full w-8 h-8 inline-flex items-center justify-center font-bold text-xs">
-            {initials(profile?.name ?? '')}
-          </span>
+          <Avatar photoURL={profile?.photoURL ?? ''} name={profile?.name ?? ''} size={32} />
           <button onClick={() => signOut()} className="text-xs underline opacity-90">Sair</button>
         </div>
       </div>
