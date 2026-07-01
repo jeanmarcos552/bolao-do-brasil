@@ -10,6 +10,7 @@ import MatchCard from '@/components/MatchCard';
 const base = {
   id: 'm1', homeTeam: 'Brasil', awayTeam: 'Peru', homeFlag: '🇧🇷', awayFlag: '🇵🇪',
   competition: 'Eliminatórias', cota: 10, homeScore: null as number | null, awayScore: null as number | null,
+  extraTime: false, penalties: false, homePen: 0, awayPen: 0,
   myBet: null as null | { homeGuess: number; awayGuess: number; points: number | null },
 };
 
