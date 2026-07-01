@@ -40,7 +40,6 @@ export function isEliminated(
     ? bet.homeGuess === m.homeScore && bet.awayGuess === m.awayScore
     : bet.homeGuess >= m.homeScore && bet.awayGuess >= m.awayScore;
   if (exactReachable) return false;
-  if (final) return true; // match finished, exact not reached => eliminated
   return outcome(bet.homeGuess, bet.awayGuess) !== outcome(m.homeScore, m.awayScore);
 }
 

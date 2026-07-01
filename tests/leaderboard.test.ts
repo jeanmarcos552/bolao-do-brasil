@@ -28,8 +28,10 @@ describe('isEliminated (pênaltis)', () => {
 });
 
 describe('isEliminated (jogo encerrado)', () => {
-  it('apostou 2x0 e terminou 1x0 => eliminado (exato exige ===)', () =>
-    expect(isEliminated({ homeGuess: 2, awayGuess: 0 }, live({ homeScore: 1, awayScore: 0, status: 'finished' }))).toBe(true));
+  it('apostou 2x0 e terminou 1x0 => NÃO eliminado (acertou o resultado = 1 ponto)', () =>
+    expect(isEliminated({ homeGuess: 2, awayGuess: 0 }, live({ homeScore: 1, awayScore: 0, status: 'finished' }))).toBe(false));
+  it('apostou 0x1 e terminou 1x0 => eliminado (resultado contra + exato impossível)', () =>
+    expect(isEliminated({ homeGuess: 0, awayGuess: 1 }, live({ homeScore: 1, awayScore: 0, status: 'finished' }))).toBe(true));
   it('apostou 1x0 e terminou 1x0 => NÃO eliminado (exato)', () =>
     expect(isEliminated({ homeGuess: 1, awayGuess: 0 }, live({ homeScore: 1, awayScore: 0, status: 'finished' }))).toBe(false));
 });
