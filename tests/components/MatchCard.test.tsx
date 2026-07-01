@@ -34,7 +34,8 @@ describe('MatchCard', () => {
 
   it('jogo ao vivo mostra o placar corrente, o badge e o link', () => {
     render(<MatchCard match={{ ...base, status: 'live', kickoffAt: 1, homeScore: 1, awayScore: 0 }} onSaved={() => {}} />);
-    expect(screen.getAllByText(/ao vivo/i).length).toBeGreaterThan(0);
+    // "ao vivo" bate no badge E no link; asserta o badge pelo texto exato (o link é "Acompanhar ao vivo →").
+    expect(screen.getByText('🔴 Ao vivo')).toBeInTheDocument();
     expect(screen.getByText('1')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /acompanhar ao vivo/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /salvar palpite/i })).toBeNull();
