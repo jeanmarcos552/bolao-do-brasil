@@ -68,6 +68,13 @@ describe('POST /api/admin/matches/[id]/live', () => {
     expect(res.status).toBe(409);
   });
 
+  it('404 se o jogo não existe', async () => {
+    const headers = asUser(h, 'a1', 'admin@x.com', 'Admin');
+    const { POST } = await import('@/app/api/admin/matches/[id]/live/route');
+    const res = await POST(send(headers, { homeScore: 1, awayScore: 0 }), ctx('inexistente'));
+    expect(res.status).toBe(404);
+  });
+
   it('403 para não-admin', async () => {
     const headers = asUser(h, 'u1', 'user@x.com', 'User');
     const { POST } = await import('@/app/api/admin/matches/[id]/live/route');

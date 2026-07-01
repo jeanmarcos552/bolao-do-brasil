@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 const call = vi.fn().mockResolvedValue({ ok: true });
@@ -41,5 +41,12 @@ describe('AdminLiveControls', () => {
   it('ao vivo com pênaltis marcado: mostra inputs de pênaltis', () => {
     render(<AdminLiveControls match={{ ...base, status: 'live', penalties: true }} onChanged={() => {}} />);
     expect(screen.getByLabelText(/pênaltis mandante/i)).toBeInTheDocument();
+  });
+
+  it('chama onChanged após a ação (re-fetch da página)', async () => {
+    const onChanged = vi.fn();
+    render(<AdminLiveControls match={{ ...base, status: 'live', homeScore: 1, awayScore: 0 }} onChanged={onChanged} />);
+    await userEvent.click(screen.getByRole('button', { name: /atualizar placar/i }));
+    await waitFor(() => expect(onChanged).toHaveBeenCalled());
   });
 });
