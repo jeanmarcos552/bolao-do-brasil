@@ -26,6 +26,7 @@ export default function Home() {
 
   if (matches === null) return <Loading />;
 
+  const aoVivo = matches.filter((m) => m.status === 'live');
   const proximos = matches.filter((m) => m.status === 'scheduled');
   const encerrados = matches.filter((m) => m.status === 'finished');
 
@@ -33,7 +34,14 @@ export default function Home() {
     <main className="max-w-2xl mx-auto p-4">
       {err && <p className="text-red-600 text-sm mb-2">{err}</p>}
 
-      <h2 className="text-verde font-extrabold text-sm uppercase tracking-wide border-l-4 border-verde pl-2 mb-2.5">Próximos jogos</h2>
+      {aoVivo.length > 0 && (
+        <>
+          <h2 className="text-red-600 font-extrabold text-sm uppercase tracking-wide border-l-4 border-red-600 pl-2 mb-2.5">🔴 Ao vivo</h2>
+          {aoVivo.map((m) => <MatchCard key={m.id} match={m} onSaved={load} />)}
+        </>
+      )}
+
+      <h2 className="text-verde font-extrabold text-sm uppercase tracking-wide border-l-4 border-verde pl-2 mb-2.5 mt-6">Próximos jogos</h2>
       {proximos.length === 0 && <p className="text-gray-500 text-sm mb-4">Nenhum jogo agendado.</p>}
       {proximos.map((m) => <MatchCard key={m.id} match={m} onSaved={load} />)}
 

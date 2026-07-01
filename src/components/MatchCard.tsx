@@ -19,14 +19,17 @@ function Team({ flag, name }: { flag: string; name: string }) {
 
 export default function MatchCard({ match, onSaved }: { match: MatchWithBet; onSaved: () => void }) {
   const { call } = useAuth();
-  const locked = match.status === 'finished' || isLocked(match.kickoffAt);
+  const isLive = match.status === 'live';
+  const showScore = match.status === 'finished' || isLive;
+  const canBet = match.status === 'scheduled' && !isLocked(match.kickoffAt);
   const [home, setHome] = useState(match.myBet ? String(match.myBet.homeGuess) : '');
   const [away, setAway] = useState(match.myBet ? String(match.myBet.awayGuess) : '');
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   async function save() {
-    setSaving(true); setErr(null);
+    setSaving(true);
+    setErr(null);
     try {
       await call(`/api/matches/${match.id}/bet`, { method: 'POST', body: { homeGuess: Number(home), awayGuess: Number(away) } });
       onSaved();
@@ -41,30 +44,34 @@ export default function MatchCard({ match, onSaved }: { match: MatchWithBet; onS
     <div className="bg-white border border-gray-200 rounded-md mb-2.5 p-4">
       <div className="flex justify-between text-[11px] uppercase tracking-wide text-gray-400 mb-2.5">
         <span>{match.competition} · {formatKickoff(match.kickoffAt)}</span>
-        <span className="text-verde font-bold">Cota {formatBRL(match.cota)}</span>
+        {isLive ? (
+          <span className="text-red-600 font-bold">🔴 Ao vivo</span>
+        ) : (
+          <span className="text-verde font-bold">Cota {formatBRL(match.cota)}</span>
+        )}
       </div>
 
       <div className="flex items-center justify-center gap-3.5">
         <Team flag={match.homeFlag} name={match.homeTeam} />
-        {match.status === 'finished' ? (
+        {showScore ? (
           <>
-            <span className="text-3xl font-extrabold">{match.homeScore}</span>
+            <span className="text-3xl font-extrabold">{match.homeScore ?? 0}</span>
             <span className="text-gray-400 font-bold text-sm">x</span>
-            <span className="text-3xl font-extrabold">{match.awayScore}</span>
+            <span className="text-3xl font-extrabold">{match.awayScore ?? 0}</span>
           </>
         ) : (
           <>
-            <input aria-label="placar mandante" inputMode="numeric" value={home} onChange={(e) => setHome(e.target.value)} disabled={locked}
+            <input aria-label="placar mandante" inputMode="numeric" value={home} onChange={(e) => setHome(e.target.value)} disabled={!canBet}
               className="w-11 h-11 border-2 border-verde rounded text-center text-2xl font-extrabold disabled:bg-gray-100 disabled:border-gray-300" />
             <span className="text-gray-400 font-bold text-sm">x</span>
-            <input aria-label="placar visitante" inputMode="numeric" value={away} onChange={(e) => setAway(e.target.value)} disabled={locked}
+            <input aria-label="placar visitante" inputMode="numeric" value={away} onChange={(e) => setAway(e.target.value)} disabled={!canBet}
               className="w-11 h-11 border-2 border-verde rounded text-center text-2xl font-extrabold disabled:bg-gray-100 disabled:border-gray-300" />
           </>
         )}
         <Team flag={match.awayFlag} name={match.awayTeam} />
       </div>
 
-      {match.status !== 'finished' && !locked && (
+      {canBet && (
         <>
           <button onClick={save} disabled={saving || home === '' || away === ''}
             className="mt-3 w-full bg-verde text-white font-extrabold py-2.5 rounded uppercase text-xs tracking-wide disabled:opacity-50">
@@ -73,14 +80,24 @@ export default function MatchCard({ match, onSaved }: { match: MatchWithBet; onS
           <div className="text-center text-[11px] text-gray-400 mt-2">🔒 Trava no apito inicial · {formatKickoff(match.kickoffAt)}</div>
         </>
       )}
-      {match.status !== 'finished' && locked && (
+      {match.status === 'scheduled' && !canBet && (
         <div className="text-center text-[11px] text-gray-400 mt-2">🔒 Palpites encerrados {match.myBet ? `· seu palpite: ${match.myBet.homeGuess} x ${match.myBet.awayGuess}` : '· você não palpitou'}</div>
+      )}
+      {isLive && (
+        <div className="text-center mt-2.5 text-xs">
+          <Link href={`/jogo/${match.id}`} className="text-verde underline">Acompanhar ao vivo →</Link>
+        </div>
       )}
       {match.status === 'finished' && (
         <div className="text-center mt-2.5 text-xs text-gray-600">
-          {match.myBet ? <>Seu palpite: <b>{match.myBet.homeGuess} x {match.myBet.awayGuess}</b> &nbsp;
-            {match.myBet.points != null && <span className="bg-verde-claro text-verde rounded px-2 py-0.5 font-bold">+{match.myBet.points} ponto{match.myBet.points === 1 ? '' : 's'}</span>}</>
-            : 'Você não palpitou neste jogo'}
+          {match.myBet ? (
+            <>
+              Seu palpite: <b>{match.myBet.homeGuess} x {match.myBet.awayGuess}</b> &nbsp;
+              {match.myBet.points != null && <span className="bg-verde-claro text-verde rounded px-2 py-0.5 font-bold">+{match.myBet.points} ponto{match.myBet.points === 1 ? '' : 's'}</span>}
+            </>
+          ) : (
+            'Você não palpitou neste jogo'
+          )}
           <div className="mt-2"><Link href={`/jogo/${match.id}`} className="text-verde underline text-xs">Ver palpites e vencedor →</Link></div>
         </div>
       )}

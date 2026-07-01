@@ -31,4 +31,12 @@ describe('MatchCard', () => {
     render(<MatchCard match={{ ...base, status: 'finished', kickoffAt: 1, homeScore: 2, awayScore: 0, myBet: { homeGuess: 1, awayGuess: 1, points: null } }} onSaved={() => {}} />);
     expect(screen.queryByText(/null/)).toBeNull();
   });
+
+  it('jogo ao vivo mostra o placar corrente, o badge e o link', () => {
+    render(<MatchCard match={{ ...base, status: 'live', kickoffAt: 1, homeScore: 1, awayScore: 0 }} onSaved={() => {}} />);
+    expect(screen.getAllByText(/ao vivo/i).length).toBeGreaterThan(0);
+    expect(screen.getByText('1')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /acompanhar ao vivo/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /salvar palpite/i })).toBeNull();
+  });
 });
