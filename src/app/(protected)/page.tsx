@@ -1,6 +1,7 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthProvider';
+import { useMatchesLive } from '@/hooks/useMatchesLive';
 import Loading from '@/components/Loading';
 import MatchCard from '@/components/MatchCard';
 import BrasilCarousel from '@/components/BrasilCarousel';
@@ -23,6 +24,10 @@ export default function Home() {
   }, [call]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Placar dos jogos ao vivo atualiza em tempo real via WebSocket (com poll de 25s de fallback).
+  const liveIds = (matches ?? []).filter((m) => m.status === 'live').map((m) => m.id);
+  useMatchesLive(liveIds, load);
 
   if (matches === null) return <Loading />;
 
