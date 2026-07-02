@@ -50,6 +50,11 @@ export default function Home() {
       {proximos.length === 0 && <p className="text-gray-500 text-sm mb-4">Nenhum jogo agendado.</p>}
       {proximos.map((m) => <MatchCard key={m.id} match={m} onSaved={load} />)}
 
+      <BrasilCarousel
+        slides={[{ src: '/images/alemao-chorando.webp', alt: 'Torcedor alemão chorando' }]}
+        caption="Aqui é Brasil!"
+      />
+
       <h2 className="text-verde font-extrabold text-sm uppercase tracking-wide border-l-4 border-verde pl-2 mb-2.5 mt-6">Encerrados</h2>
       {encerrados.length === 0 && <p className="text-gray-500 text-sm">Nenhum jogo encerrado ainda.</p>}
       {encerrados.map((m) => <MatchCard key={m.id} match={m} onSaved={load} />)}
