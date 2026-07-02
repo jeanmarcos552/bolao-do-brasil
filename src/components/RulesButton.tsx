@@ -26,9 +26,9 @@ export default function RulesButton() {
         onClick={() => setOpen(true)}
         aria-label="Regras do bolão"
         title="Regras do bolão"
-        className="text-white/90 hover:text-white text-xl leading-none"
+        className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded px-2.5 py-1"
       >
-        📖
+        Regras
       </button>
 
       {open && (

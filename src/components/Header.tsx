@@ -20,7 +20,7 @@ export default function Header() {
       <div className="bg-verde-escuro text-white px-4 py-3 flex items-center justify-between">
         <div className="font-extrabold text-lg tracking-wide flex items-center gap-2">
           <span className="bg-amarelo text-verde-escuro rounded-full w-7 h-7 inline-flex items-center justify-center">⚽</span>
-          BOLÃO DA SELEÇÃO
+          BOLÃO
         </div>
         <div className="flex items-center gap-3">
           <RulesButton />

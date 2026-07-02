@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { AuthProvider } from '@/context/AuthProvider';
 
 export const metadata: Metadata = {
-  title: 'Bolão da Seleção',
+  title: 'Bolão',
   description: 'Bolão dos próximos jogos da Seleção Brasileira',
 };
 
