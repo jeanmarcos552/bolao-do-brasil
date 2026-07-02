@@ -31,6 +31,13 @@ describe('MatchCard', () => {
     expect(screen.getByRole('button', { name: /alterar palpite/i })).toBeInTheDocument();
   });
 
+  it('ao voltar com palpite já salvo, mostra o feedback e "Alterar palpite" sem clicar', () => {
+    render(<MatchCard match={{ ...base, status: 'scheduled', kickoffAt: Date.now() + 3_600_000,
+      myBet: { homeGuess: 2, awayGuess: 1, points: null, updatedAt: Date.now() - 60_000 } }} onSaved={() => {}} />);
+    expect(screen.getByText(/palpite salvo às/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /alterar palpite/i })).toBeInTheDocument();
+  });
+
   it('jogo encerrado mostra o placar final e os pontos', () => {
     render(<MatchCard match={{ ...base, status: 'finished', kickoffAt: 1, homeScore: 3, awayScore: 0, myBet: { homeGuess: 2, awayGuess: 0, points: 1 } }} onSaved={() => {}} />);
     expect(screen.getByText('3')).toBeInTheDocument();

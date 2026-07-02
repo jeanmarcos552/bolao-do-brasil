@@ -34,4 +34,6 @@ export interface BetDTO {
   homeGuess: number;
   awayGuess: number;
   points: number | null;
+  /** Epoch ms de quando o palpite foi salvo. Exposto para o feedback "salvo às HH:MM". */
+  updatedAt?: number | null;
 }

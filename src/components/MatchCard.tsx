@@ -6,7 +6,7 @@ import { formatBRL, formatKickoff, isLocked } from '@/lib/format';
 import Flag from '@/components/Flag';
 import type { MatchDTO, BetDTO } from '@/lib/types';
 
-type MatchWithBet = MatchDTO & { myBet: Pick<BetDTO, 'homeGuess' | 'awayGuess' | 'points'> | null };
+type MatchWithBet = MatchDTO & { myBet: Pick<BetDTO, 'homeGuess' | 'awayGuess' | 'points' | 'updatedAt'> | null };
 
 function Team({ flag, name }: { flag: string; name: string }) {
   return (
@@ -43,6 +43,11 @@ export default function MatchCard({ match, onSaved }: { match: MatchWithBet; onS
   }
 
   const hasBet = match.myBet != null || savedAt != null;
+  // Horário do save: o desta sessão (savedAt) ou o persistido (myBet.updatedAt), pra o feedback
+  // reaparecer ao voltar na página, não só logo após clicar.
+  const savedTime = savedAt ?? (match.myBet?.updatedAt
+    ? new Date(match.myBet.updatedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    : null);
 
   return (
     <div className="bg-white border border-gray-200 rounded-md mb-2.5 p-4">
@@ -77,9 +82,9 @@ export default function MatchCard({ match, onSaved }: { match: MatchWithBet; onS
 
       {canBet && (
         <>
-          {savedAt && (
+          {savedTime && (
             <div className="mt-3 bg-verde-claro border border-verde-escuro text-verde-escuro rounded px-3 py-2 text-xs text-center">
-              ✓ Palpite salvo às {savedAt}. Você pode alterar até o início do jogo.
+              ✓ Palpite salvo às {savedTime}. Você pode alterar até o início do jogo.
             </div>
           )}
           <button onClick={save} disabled={saving || home === '' || away === ''}
