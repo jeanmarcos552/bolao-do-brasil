@@ -1,4 +1,4 @@
-// Renderiza a bandeira de um time a partir de uma URL (.svg, ex.: CDN do Globo Esporte).
+// Renderiza a bandeira de um time a partir de um caminho .svg (hoje os assets locais em /flags/*.svg; também aceita URLs externas de jogos antigos).
 // Usa <img> simples (não next/image) para evitar configurar domínios externos.
 export default function Flag({ src, alt, className = '' }: { src: string; alt: string; className?: string }) {
   if (!src) {
