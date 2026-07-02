@@ -25,6 +25,7 @@ export default function MatchCard({ match, onSaved }: { match: MatchWithBet; onS
   const [home, setHome] = useState(match.myBet ? String(match.myBet.homeGuess) : '');
   const [away, setAway] = useState(match.myBet ? String(match.myBet.awayGuess) : '');
   const [saving, setSaving] = useState(false);
+  const [savedAt, setSavedAt] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   async function save() {
@@ -32,6 +33,7 @@ export default function MatchCard({ match, onSaved }: { match: MatchWithBet; onS
     setErr(null);
     try {
       await call(`/api/matches/${match.id}/bet`, { method: 'POST', body: { homeGuess: Number(home), awayGuess: Number(away) } });
+      setSavedAt(new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
       onSaved();
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Erro ao salvar palpite');
@@ -39,6 +41,8 @@ export default function MatchCard({ match, onSaved }: { match: MatchWithBet; onS
       setSaving(false);
     }
   }
+
+  const hasBet = match.myBet != null || savedAt != null;
 
   return (
     <div className="bg-white border border-gray-200 rounded-md mb-2.5 p-4">
@@ -73,9 +77,14 @@ export default function MatchCard({ match, onSaved }: { match: MatchWithBet; onS
 
       {canBet && (
         <>
+          {savedAt && (
+            <div className="mt-3 bg-verde-claro border border-verde-escuro text-verde-escuro rounded px-3 py-2 text-xs text-center">
+              ✓ Palpite salvo às {savedAt}. Você pode alterar até o início do jogo.
+            </div>
+          )}
           <button onClick={save} disabled={saving || home === '' || away === ''}
             className="mt-3 w-full bg-verde text-white font-extrabold py-2.5 rounded uppercase text-xs tracking-wide disabled:opacity-50">
-            {saving ? 'Salvando…' : 'Salvar palpite'}
+            {saving ? 'Salvando…' : hasBet ? 'Alterar palpite' : 'Salvar palpite'}
           </button>
           <div className="text-center text-[11px] text-gray-400 mt-2">🔒 Trava no apito inicial · {formatKickoff(match.kickoffAt)}</div>
         </>

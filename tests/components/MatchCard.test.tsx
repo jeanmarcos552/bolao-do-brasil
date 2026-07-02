@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 const call = vi.fn().mockResolvedValue({ ok: true });
 vi.mock('@/context/AuthProvider', () => ({ useAuth: () => ({ call }) }));
@@ -18,6 +19,16 @@ describe('MatchCard', () => {
   it('jogo aberto mostra o formulário de palpite', () => {
     render(<MatchCard match={{ ...base, status: 'scheduled', kickoffAt: Date.now() + 3_600_000 }} onSaved={() => {}} />);
     expect(screen.getByRole('button', { name: /salvar palpite/i })).toBeInTheDocument();
+  });
+
+  it('após salvar, mostra o feedback de sucesso e o botão vira "Alterar palpite"', async () => {
+    const user = userEvent.setup();
+    render(<MatchCard match={{ ...base, status: 'scheduled', kickoffAt: Date.now() + 3_600_000 }} onSaved={() => {}} />);
+    await user.type(screen.getByLabelText('placar mandante'), '2');
+    await user.type(screen.getByLabelText('placar visitante'), '1');
+    await user.click(screen.getByRole('button', { name: /salvar palpite/i }));
+    expect(await screen.findByText(/palpite salvo às/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /alterar palpite/i })).toBeInTheDocument();
   });
 
   it('jogo encerrado mostra o placar final e os pontos', () => {
