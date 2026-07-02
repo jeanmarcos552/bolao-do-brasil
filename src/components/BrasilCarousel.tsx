@@ -10,7 +10,8 @@ const DEFAULT_SLIDES: Slide[] = [
 export default function BrasilCarousel({
   slides = DEFAULT_SLIDES,
   caption = 'Brasil tem 5 estrelas',
-}: { slides?: Slide[]; caption?: string } = {}) {
+  showStars = true,
+}: { slides?: Slide[]; caption?: string; showStars?: boolean } = {}) {
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
@@ -30,7 +31,7 @@ export default function BrasilCarousel({
       <div className="absolute inset-0" style={{ background: 'rgba(0, 80, 31, 0.65)' }} />
 
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-        <span className="text-amarelo text-3xl tracking-[0.4em] drop-shadow-lg">★★★★★</span>
+        {showStars && <span className="text-amarelo text-3xl tracking-[0.4em] drop-shadow-lg">★★★★★</span>}
         <span className="text-amarelo font-extrabold text-xl sm:text-2xl tracking-widest uppercase drop-shadow-lg">
           {caption}
         </span>

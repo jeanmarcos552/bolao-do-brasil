@@ -53,6 +53,7 @@ export default function Home() {
       <BrasilCarousel
         slides={[{ src: '/images/alemao-chorando.webp', alt: 'Torcedor alemão chorando' }]}
         caption="Aqui é Brasil!"
+        showStars={false}
       />
 
       <h2 className="text-verde font-extrabold text-sm uppercase tracking-wide border-l-4 border-verde pl-2 mb-2.5 mt-6">Encerrados</h2>
