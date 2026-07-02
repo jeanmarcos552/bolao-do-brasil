@@ -12,6 +12,8 @@ import type { MatchDTO, BetDTO } from '@/lib/types';
 type MatchWithBet = MatchDTO & { myBet: BetDTO | null };
 
 function flagOf(name: string): string {
+  // O ?? '' é defensivo e inalcançável com o TEAMS atual (só chamamos com nomes vindos do próprio catálogo);
+  // se algum dia ficar vazio, o <Flag> degrada para o ⚽ em vez de quebrar.
   return TEAMS.find((t) => t.name === name)?.flag ?? '';
 }
 
