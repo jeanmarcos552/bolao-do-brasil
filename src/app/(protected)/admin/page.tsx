@@ -61,31 +61,31 @@ export default function AdminPage() {
 
       <section className="bg-white border border-gray-200 rounded p-4 mb-6">
         <h2 className="font-bold mb-2">Cadastrar jogo</h2>
-        <div className="grid grid-cols-2 gap-2 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
           <label className="flex flex-col">Mandante
             <div className="flex items-center gap-2 mt-1">
               <select value={form.homeTeam}
                 onChange={(e) => setForm({ ...form, homeTeam: e.target.value, homeFlag: flagOf(e.target.value) })}
-                className="border rounded p-1.5 flex-1">
+                className="border rounded p-1.5 flex-1 min-w-0">
                 {TEAMS.map((t) => <option key={t.name} value={t.name}>{t.name}</option>)}
               </select>
-              <Flag src={form.homeFlag} alt={form.homeTeam} className="w-6 h-5" />
+              <Flag src={form.homeFlag} alt={form.homeTeam} className="w-6 h-5 shrink-0" />
             </div>
           </label>
           <label className="flex flex-col">Visitante
             <div className="flex items-center gap-2 mt-1">
               <select value={form.awayTeam}
                 onChange={(e) => setForm({ ...form, awayTeam: e.target.value, awayFlag: flagOf(e.target.value) })}
-                className="border rounded p-1.5 flex-1">
+                className="border rounded p-1.5 flex-1 min-w-0">
                 <option value="">Selecione…</option>
                 {TEAMS.map((t) => <option key={t.name} value={t.name}>{t.name}</option>)}
               </select>
-              <Flag src={form.awayFlag} alt={form.awayTeam} className="w-6 h-5" />
+              <Flag src={form.awayFlag} alt={form.awayTeam} className="w-6 h-5 shrink-0" />
             </div>
           </label>
           <label className="flex flex-col">Competição<input value={form.competition} onChange={(e) => setForm({ ...form, competition: e.target.value })} className="border rounded p-1.5" /></label>
           <label className="flex flex-col">Cota (R$)<input type="number" value={form.cota} onChange={(e) => setForm({ ...form, cota: e.target.value })} className="border rounded p-1.5" /></label>
-          <label className="flex flex-col col-span-2">Data e hora do jogo<input type="datetime-local" value={form.kickoff} onChange={(e) => setForm({ ...form, kickoff: e.target.value })} className="border rounded p-1.5" /></label>
+          <label className="flex flex-col sm:col-span-2">Data e hora do jogo<input type="datetime-local" value={form.kickoff} onChange={(e) => setForm({ ...form, kickoff: e.target.value })} className="border rounded p-1.5" /></label>
         </div>
         <button onClick={criar} disabled={!form.homeTeam || !form.awayTeam || !form.kickoff}
           className="mt-3 bg-verde text-white font-bold py-2 px-4 rounded uppercase text-xs disabled:opacity-50">Cadastrar jogo</button>
