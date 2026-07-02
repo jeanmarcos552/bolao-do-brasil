@@ -1,0 +1,35 @@
+# Reconstruidos/gerados dentro do build
+node_modules
+.next
+out
+build
+
+# Segredos e ambiente local — NUNCA entram na imagem
+.env
+.env.local
+.env*.local
+.env.production
+*serviceAccount*.json
+*firebase-adminsdk*.json
+*-adminsdk-*.json
+
+# Git e scratch
+.git
+.gitignore
+.superpowers
+
+# Testes e dev — nao necessarios em producao
+tests
+coverage
+vitest.config.*
+
+# Editor / OS
+.vscode
+.idea
+*.log
+npm-debug.log*
+.DS_Store
+
+# Docs
+docs
+README*.md
