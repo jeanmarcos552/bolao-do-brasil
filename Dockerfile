@@ -1,16 +1,17 @@
 # syntax=docker/dockerfile:1
 # Build multi-stage do Next.js em modo standalone (next.config.mjs: output:'standalone').
-# Node 20 slim (Debian) — evita surpresas de libs nativas do firebase-admin no musl do Alpine.
+# Node 22 slim (Debian): firebase-admin@14 exige engine node>=22; slim evita
+# surpresas de libs nativas no musl do Alpine.
 
 # 1) Dependencias (cacheavel enquanto o lockfile nao muda)
-FROM node:20-bookworm-slim AS deps
+FROM node:22-bookworm-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
 # 2) Build. As NEXT_PUBLIC_* sao inlinadas no bundle do cliente em build-time,
 #    entao precisam existir aqui (passadas como --build-arg no docker build).
-FROM node:20-bookworm-slim AS builder
+FROM node:22-bookworm-slim AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -31,7 +32,7 @@ RUN npm run build
 
 # 3) Runtime enxuto. Segredos de servidor (FIREBASE_ADMIN_*, WS_API_KEY, etc.)
 #    entram em runtime via --env-file, nunca embutidos na imagem.
-FROM node:20-bookworm-slim AS runner
+FROM node:22-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
