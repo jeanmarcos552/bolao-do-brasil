@@ -1,0 +1,14 @@
+# Roda no VPS (Bitnami) em ~/apps/bolao. Imagem pronta do GHCR — sem build aqui.
+# IMAGE_TAG vem do .env ao lado (escrito pelo CI a cada deploy); cai para "latest"
+# se ausente. Segredos de servidor: reaproveita o bolao.env que ja existe em
+# ~/apps/ (referenciado como ../bolao.env). Porta so no loopback — o Apache do
+# Bitnami faz o proxy de bolao.jeansilva.app.br -> 127.0.0.1:3002.
+services:
+  web:
+    image: ghcr.io/jeanmarcos552/bolao-do-brasil:${IMAGE_TAG:-latest}
+    container_name: bolao
+    restart: unless-stopped
+    env_file:
+      - ../bolao.env
+    ports:
+      - "127.0.0.1:3002:3002"
