@@ -19,6 +19,7 @@ describe('RulesButton', () => {
     // regra fiel ao código (placar exato = 3, não 2)
     expect(screen.getByText(/Placar exato:/i)).toBeInTheDocument();
     expect(screen.getByText(/3 pontos/i)).toBeInTheDocument();
+    expect(screen.getByText(/o perdedor paga o vencedor via pix/i)).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /fechar/i }));
     expect(screen.queryByRole('dialog')).toBeNull();

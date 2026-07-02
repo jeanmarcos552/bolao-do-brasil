@@ -59,6 +59,14 @@ export default function RulesButton() {
               </section>
 
               <section>
+                <h3 className="text-red-600 font-bold mb-1.5">Prêmio</h3>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Em cada jogo, quem não faz a maior pontuação paga uma cota (valor mostrado no card do jogo).</li>
+                  <li className="text-red-600 font-semibold">O total arrecadado vai para o(s) vencedor(es) da rodada — o perdedor paga o vencedor via Pix.</li>
+                </ul>
+              </section>
+
+              <section>
                 <h3 className="text-red-600 font-bold mb-1.5">Palpites</h3>
                 <ul className="list-disc pl-5 space-y-1">
                   <li className="text-red-600 font-semibold">Um palpite por jogo — dá para alterar até o início do jogo; depois trava.</li>
