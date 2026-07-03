@@ -12,7 +12,7 @@ export default function LoginPage() {
   }, [loading, user, router]);
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-end pb-10 sm:pb-16 bg-verde-escuro relative overflow-hidden">
+    <main className="min-h-dvh flex flex-col items-center justify-end pb-10 sm:pb-16 bg-verde-escuro relative overflow-hidden">
       <img src="/bg_login.webp" alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
       <div className="relative z-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-xl p-8 max-w-sm w-full mx-4 text-center">
         <div className="text-3xl mb-2 drop-shadow">⚽🇧🇷</div>
